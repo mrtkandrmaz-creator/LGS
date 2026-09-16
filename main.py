@@ -32,21 +32,32 @@ st.markdown("""
         color: white;
         box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
     }
-    .question-card {
+    .hero-card {
+        background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(67, 97, 238, 0.2);
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .hero-card h1 {
+        color: white;
+        font-size: 2.2rem;
+        margin-bottom: 15px;
+    }
+    .hero-card p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+    .tip-card {
         background-color: #ffffff;
         padding: 24px;
         border-radius: 12px;
         border: 1px solid #e2e8f0;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        margin-bottom: 20px;
-    }
-    .badge {
-        background-color: #e0f2fe;
-        color: #0369a1;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: bold;
+        border-left: 5px solid #4361ee;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -102,7 +113,7 @@ def veri_yukle():
         "Matematik": [{
             "unite": "Çarpanlar ve Katlar",
             "zorluk": "Orta",
-            "tip": "Soru Bankası",
+            "tip": "Testler",
             "soru": "Örnek Soru: 18 ve 24 sayısal değerlerinin en büyük ortak böleni (EBOB) kaçtır?",
             "secenekler": ["A) 3", "B) 6", "C) 9", "D) 12"],
             "cevap": "B"
@@ -151,13 +162,13 @@ st.sidebar.markdown("---")
 # Ana Menüler
 ana_menu = st.sidebar.radio(
     "📌 Ana Menüler", 
-    ["📚 Soru Bankası", "📝 Testler", "🏆 Deneme Sınavları", "🎬 Video Dersler"]
+    ["📝 Testler", "🏆 Deneme Sınavları", "🎬 Video Dersler"]
 )
 
 st.sidebar.markdown("---")
 
 # Seçilen menüye göre sol panelde ders ve ünite filtrelerini göster
-if ana_menu in ["📚 Soru Bankası", "📝 Testler", "🏆 Deneme Sınavları"]:
+if ana_menu in ["📝 Testler", "🏆 Deneme Sınavları"]:
     st.sidebar.markdown("### ⚙️ Filtreler")
     secilen_ders = st.sidebar.selectbox("📚 Seçmeli Ders", list(DERS_UNITELERI.keys()))
     mevcut_uniteler = DERS_UNITELERI.get(secilen_ders, [])
@@ -178,11 +189,9 @@ secilen_soru_adedi = st.sidebar.number_input(
     step=1
 )
 
-# İstediğiniz gibi "Soru Üret" butonu soru seçimi alanının hemen altına eklendi
 soru_uret_tiklandi = st.sidebar.button("✨ Yapay Zeka ile Soru Üret")
 
-# --- ANA EKRAN İÇERİKLERİ (ANA MENÜYE GÖRE DEĞİŞİR) ---
-
+# --- YAPAY ZEKA İLE SORU ÜRETME MANTIĞI ---
 if soru_uret_tiklandi:
     if not ai_client:
         st.error("Gemini AI istemcisi başlatılamadı. Lütfen API anahtarınızı kontrol edin.")
@@ -213,7 +222,7 @@ if soru_uret_tiklandi:
                     yeni_soru = {
                         "unite": secilen_unite,
                         "zorluk": secilen_zorluk,
-                        "tip": ana_menu.replace("📚 ", "").replace("📝 ", "").replace("🏆 ", ""),
+                        "tip": ana_menu.replace("📝 ", "").replace("🏆 ", ""),
                         "soru": jdata.get("soru"),
                         "secenekler": jdata.get("secenekler"),
                         "cevap": jdata.get("cevap")
@@ -233,59 +242,35 @@ if soru_uret_tiklandi:
             else:
                 st.error("Soru üretilirken bir hata oluştu. Lütfen tekrar deneyin.")
 
-if ana_menu == "📚 Soru Bankası":
-    st.header("📚 Soru Bankası")
-    st.markdown(f"**{secilen_ders}** » *{secilen_unite}* ({secilen_zorluk}) | Hedef Adet: **{secilen_soru_adedi}**")
-    st.markdown("---")
+# --- ANA EKRAN İÇERİKLERİ ---
+if ana_menu in ["📝 Testler", "🏆 Deneme Sınavları"]:
+    # Sayfanın ortasında modern karşılama ve ipucu alanı
+    st.markdown("""
+        <div class="hero-card">
+            <h1>🚀 LGS Hazırlık Asistanına Hoş Geldiniz!</h1>
+            <p>Hedeflerinize ulaşmak için sol menüyü kullanarak ders, ünite ve soru adedini seçebilir; yapay zeka desteğiyle çalışmalarınızı güçlendirebilirsiniz.</p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    ders_sorulari = st.session_state.dersler.get(secilen_ders, [])
-    filtrelenmis_sorular = [
-        s for s in ders_sorulari 
-        if s.get("unite", "") == secilen_unite and 
-           (secilen_zorluk == "Karma" or s.get("zorluk", "Orta") == secilen_zorluk)
-    ]
-    
-    if not filtrelenmis_sorular:
-        st.warning("Bu filtreye uygun soru bulunamadı. Sol panelden **'✨ Yapay Zeka ile Soru Üret'** butonuna basarak anında soru oluşturabilirsiniz!")
-    else:
-        if st.session_state.aktif_soru_index >= len(filtrelenmis_sorular):
-            st.session_state.aktif_soru_index = 0
-            
-        index = st.session_state.aktif_soru_index
-        soru_data = filtrelenmis_sorular[index]
-        
-        st.markdown(f"**Soru {index + 1} / {len(filtrelenmis_sorular)}**")
-        st.markdown(f"<div class='question-card'><h4>{soru_data['soru']}</h4></div>", unsafe_allow_html=True)
-        
-        secenekler = soru_data["secenekler"]
-        secilen_secenek = st.radio("Seçiminizi yapın:", secenekler, key=f"sb_{index}")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("Cevabı Kontrol Et", key="sb_kontrol"):
-                dogru_cevap = soru_data["cevap"]
-                secilen_harf = secilen_secenek.split(")")[0].strip()
-                if secilen_harf == dogru_cevap:
-                    st.success("Tebrikler! Doğru Cevap 🎉")
-                else:
-                    st.error(f"Yanlış cevap. Doğru cevap: {dogru_cevap}")
-        with col2:
-            if st.button("Sonraki Soru ➡️", key="sb_sonraki"):
-                st.session_state.aktif_soru_index = (st.session_state.aktif_soru_index + 1) % len(filtrelenmis_sorular)
-                st.rerun()
-
-elif ana_menu == "📝 Testler":
-    st.header("📝 Ünite Testleri")
-    st.markdown(f"Seçilen Ünite: **{secilen_unite}** | Hedef Soru Adedi: **{secilen_soru_adedi}**")
-    st.info("Sol paneldeki **'✨ Yapay Zeka ile Soru Üret'** butonunu kullanarak belirttiğiniz sayıda test sorusunu anında oluşturabilirsiniz.")
-
-elif ana_menu == "🏆 Deneme Sınavları":
-    st.header("🏆 Genel LGS Deneme Sınavları")
-    st.markdown(f"Sınav Kapsamı: **{secilen_soru_adedi} Soruluk Deneme Simülasyonu**")
-    st.warning("Sol paneldeki **'✨ Yapay Zeka ile Soru Üret'** butonu ile deneme sınavı havuzunu zenginleştirebilirsiniz.")
+    col_bosluk1, col_orta, col_bosluk2 = st.columns([1, 8, 1])
+    with col_orta:
+        st.markdown(f"""
+            <div class="tip-card">
+                <h4>💡 Çalışma Rehberi & İpucu</h4>
+                <p style="margin-bottom: 8px;"><b>Seçilen Ders:</b> {secilen_ders} &nbsp;|&nbsp; <b>Ünite:</b> {secilen_unite}</p>
+                <p style="margin-bottom: 0; color: #555;">Sol paneldeki <b>'✨ Yapay Zeka ile Soru Üret'</b> butonunu kullanarak belirlediğiniz adet kadar soruyu anında sisteme tanımlayabilirsiniz.</p>
+            </div>
+        """, unsafe_allow_html=True)
 
 elif ana_menu == "🎬 Video Dersler":
     st.header("🎬 Konu Anlatım ve Çözüm Videoları")
+    st.markdown("""
+        <div class="tip-card" style="margin-bottom: 20px;">
+            <h4>💡 Video Rehberi</h4>
+            <p style="margin-bottom: 0; color: #555;">İzlemek istediğiniz ders videosunu aşağıdaki listeden seçerek hemen çalışmaya başlayabilirsiniz.</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
     if not st.session_state.videolar:
         st.info("Kayıtlı video bulunmuyor.")
     else:
