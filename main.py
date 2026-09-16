@@ -142,14 +142,25 @@ for key, val in [("aktif_soru_index", 0), ("cevap_kontrol_edildi", False)]:
     if key not in st.session_state:
         st.session_state[key] = val
 
-# --- GEMINI AI İSTEMCİSİ ---
+# --- GEMINI AI İSTEMCİSİ (GÜNCELLENMİŞ GÜVENLİ BAĞLANTI) ---
 @st.cache_resource
 def get_ai_client():
     try:
-        api_key = st.secrets.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY"))
-        if api_key:
+        # 1. Önce Streamlit secrets içerisinden almaya çalışır
+        api_key = st.secrets.get("GEMINI_API_KEY", None)
+        
+        # 2. Eğer secrets yoksa ortam değişkenine (environment variable) bakar
+        if not api_key:
+            api_key = os.environ.get("GEMINI_API_KEY", None)
+            
+        # 3. Eğer hâlâ bulunamadıysa, aşağıdaki tırnak içine API anahtarınızı doğrudan yazabilirsiniz:
+        if not api_key:
+            api_key = "BURAYA_GERCEK_API_ANAHTARINIZI_YAZIN"
+            
+        if api_key and api_key != "BURAYA_GERCEK_API_ANAHTARINIZI_YAZIN":
             return genai.Client(api_key=api_key)
-        return genai.Client()
+            
+        return None
     except Exception:
         return None
 
@@ -194,7 +205,7 @@ soru_uret_tiklandi = st.sidebar.button("✨ Yapay Zeka ile Soru Üret")
 # --- YAPAY ZEKA İLE SORU ÜRETME MANTIĞI ---
 if soru_uret_tiklandi:
     if not ai_client:
-        st.error("Gemini AI istemcisi başlatılamadı. Lütfen API anahtarınızı kontrol edin.")
+        st.error("Gemini AI istemcisi başlatılamadı. Lütfen koddaki veya secrets dosyasındaki API anahtarınızı kontrol edin.")
     else:
         with st.spinner(f"Yapay zeka {secilen_ders} - {secilen_unite} için {secilen_soru_adedi} adet soru hazırlıyor, lütfen bekleyin..."):
             basarili_sayisi = 0
@@ -244,7 +255,6 @@ if soru_uret_tiklandi:
 
 # --- ANA EKRAN İÇERİKLERİ ---
 if ana_menu in ["📝 Testler", "🏆 Deneme Sınavları"]:
-    # Sayfanın ortasında modern karşılama ve ipucu alanı
     st.markdown("""
         <div class="hero-card">
             <h1>🚀 LGS Hazırlık Asistanına Hoş Geldiniz!</h1>
