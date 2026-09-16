@@ -1,0 +1,22 @@
+{
+  "dersler": {
+    "Matematik": [
+      {"soru": "8. Sınıf Çarpanlar ve Katlar Örnek Soru?", "secenekler": ["A) 2", "B) 3", "C) 4", "D) 5"], "cevap": "A"},
+      {"soru": "Üslü ifadelerde tabanlar aynı ise üsler ne yapılır?", "secenekler": ["A) Toplanır", "B) Çıkarılır", "C) Çarpılır", "D) Bölünür"], "cevap": "A"}
+    ],
+    "Fen Bilimleri": [
+      {"soru": "DNA'nın yapı birimi nedir?", "secenekler": ["A) Nükleotit", "B) Gen", "C) Kromozom", "D) Organel"], "cevap": "A"},
+      {"soru": "Mevsimlerin oluşmasında ne etkilidir?", "secenekler": ["A) Dünyanın basık olması", "B) Eksen eğikliği ve dolanma", "C) Ayın hareketleri", "D) Rüzgarlar"], "cevap": "B"}
+    ],
+    "Türkçe": [
+      {"soru": "Aşağıdakilerden hangisi fiilimsi değildir?", "secenekler": ["A) Koşarak", "B) Okumak", "C) Kitap", "D) Gelen"], "cevap": "C"}
+    ],
+    "İnkılap Tarihi": [
+      {"soru": "Mustafa Kemal'in doğduğu selanik hangi ilimizdedir? (Osmanlı dönemi)", "secenekler": ["A) Manastır", "B) Selanik", "C) İstanbul", "D) Sofya"], "cevap": "B"}
+    ]
+  },
+  "videolar": [
+    {"baslik": "Matematik - Çarpanlar ve Katlar", "url": "https://www.youtube.com/embed/dQw4w9WgXcQ"},
+    {"baslik": "Fen - DNA ve Genetik Kod", "url": "https://www.youtube.com/embed/dQw4w9WgXcQ"}
+  ]
+}
